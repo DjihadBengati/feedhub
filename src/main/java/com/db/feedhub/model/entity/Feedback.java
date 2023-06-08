@@ -26,7 +26,7 @@ public class Feedback {
 
   private String comment;
 
-  private LocalDateTime dateTime;
+  private LocalDateTime dateTime = LocalDateTime.now();
 
   @Override
   public String toString() {
