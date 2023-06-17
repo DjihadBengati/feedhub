@@ -5,39 +5,40 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Feedback {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(unique = true, nullable = false)
-  private UUID sessionId;
+  @Column(unique = true)
+  // TODO test constraint
+  @Email
+  private String email;
 
-  @Column(nullable = false)
-  private Integer note;
+  private boolean unsubscribe = false;
 
-  private String comment;
-
-  private LocalDateTime dateTime = LocalDateTime.now();
+  private LocalDateTime unsubscribeDateTime;
 
   @Override
   public String toString() {
-    return new org.apache.commons.lang3.builder.ToStringBuilder(this)
-        .append("sessionId", sessionId)
-        .append("note", note)
-        .append("comment", comment)
-        .append("dateTime", dateTime)
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("email", email)
+        .append("unsubscribe", unsubscribe)
+        .append("unsubscribeDateTime", unsubscribeDateTime)
         .toString();
   }
 }

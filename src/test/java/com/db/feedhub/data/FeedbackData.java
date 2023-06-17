@@ -51,6 +51,16 @@ public class FeedbackData {
     return feedback;
   }
 
+  public static Feedback feedback_4() {
+    Feedback feedback = new Feedback();
+    feedback.setId(randomUUID());
+    feedback.setSessionId(randomUUID());
+    feedback.setDateTime(now());
+    feedback.setComment("Good !");
+    feedback.setNote(5);
+    return feedback;
+  }
+
   public static FeedbackApi feedbackApi() {
     return new FeedbackApi(id, sessionId, 10, "Excellent !", dateTime);
   }
