@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Entity
+@Table(name = "feedhub_user")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -24,7 +26,6 @@ public class User {
   private UUID id;
 
   @Column(unique = true)
-  // TODO test constraint
   @Email
   private String email;
 

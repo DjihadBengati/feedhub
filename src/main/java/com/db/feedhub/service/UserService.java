@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import com.db.feedhub.config.CompanyConfig;
 import com.db.feedhub.model.entity.User;
 import com.db.feedhub.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,36 +31,27 @@ public class UserService {
 
   public User save(@NonNull User user) {
     log.debug("Saving new user: {}", user);
-
-    if (isBlank(user.getEmail()) ||
-        isBlank(companyConfig.getEmailPattern()) ||
-        !user.getEmail().endsWith(companyConfig.getEmailPattern())) {
-      log.error("Invalid email: {}", user);
-      throw new IllegalArgumentException("Invalid email");
-    }
-
+    checkCompanyEmailPattern(user);
     return userRepository.save(user);
   }
 
-  // TODO test this function
   public List<User> saveAll(@NonNull List<User> users) {
     log.debug("Saving {} user(s)", users.size());
+    users.forEach(this::checkCompanyEmailPattern);
     return userRepository.saveAll(users);
   }
 
-  // TODO test this function
   public void delete(@NonNull String userId) {
     log.debug("Deleting user with ID: {}", userId);
     userRepository.deleteById(UUID.fromString(userId));
   }
 
-  // TODO test this function
+  @Transactional
   public void deleteByEmail(@NonNull String email) {
     log.debug("Deleting user with email: {}", email);
     userRepository.deleteByEmail(email);
   }
 
-  // TODO test this function
   public User unsubscribe(@NonNull String email) {
     log.debug("Unsubscribe user with email: {}", email);
     Optional<User> user = userRepository.findByEmail(email);
@@ -75,21 +67,30 @@ public class UserService {
   }
 
   // TODO test this function
-  public void subscribe(@NonNull String email) {
+  public User subscribe(@NonNull String email) {
     log.debug("Subscribing user with email: {}", email);
     Optional<User> user = userRepository.findByEmail(email);
 
-    if (user.isPresent() && user.get().isUnsubscribe()) {
-      User userToUpdate = user.get();
-      userToUpdate.setUnsubscribe(false);
-      userToUpdate.setUnsubscribeDateTime(null);
-      userRepository.save(userToUpdate);
+    if (user.isEmpty() || !user.get().isUnsubscribe()) {
+      throw new IllegalArgumentException("User not found or already subscribed");
     }
 
-    throw new IllegalArgumentException("User not found or already subscribed");
+    User userToUpdate = user.get();
+    userToUpdate.setUnsubscribe(false);
+    userToUpdate.setUnsubscribeDateTime(null);
+    return userRepository.save(userToUpdate);
   }
 
   public Page<User> findAll(Pageable pageable) {
     return userRepository.findAll(pageable);
+  }
+
+  private void checkCompanyEmailPattern(User user) {
+    if (isBlank(user.getEmail()) ||
+        isBlank(companyConfig.getEmailPattern()) ||
+        !user.getEmail().endsWith(companyConfig.getEmailPattern())) {
+      log.error("Invalid email: {}", user);
+      throw new IllegalArgumentException("Invalid email");
+    }
   }
 }

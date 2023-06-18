@@ -72,6 +72,8 @@ public class SessionService {
 
     // Generate sessions for users
     generateSessionsForUsers(userService.findAll(ofSize(50)));
+
+    log.debug("{} session(s) generated", sessionRepository.count());
   }
 
   private void generateSessionsForUsers(Page<User> usersPage) {
