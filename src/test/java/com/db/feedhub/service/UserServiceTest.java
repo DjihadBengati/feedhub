@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -85,5 +87,14 @@ public class UserServiceTest {
     }
 
     assertThat(exception).isNotNull();
+  }
+
+  @Test
+  void findAll_successful() {
+    Page<User> page = userService.findAll(Pageable.ofSize(10));
+    assertThat(page).isNotNull();
+    assertThat(page.getTotalPages()).isOne();
+    assertThat(page.getContent().size()).isEqualTo(2);
+    assertThat(page.hasNext()).isFalse();
   }
 }

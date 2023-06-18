@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -86,5 +87,9 @@ public class UserService {
     }
 
     throw new IllegalArgumentException("User not found or already subscribed");
+  }
+
+  public Page<User> findAll(Pageable pageable) {
+    return userRepository.findAll(pageable);
   }
 }
