@@ -33,11 +33,17 @@ public class SessionServiceTest {
 
   @Test
   void save_successful() {
+    long countBeforeSave = sessionRepository.count();
+
     Session session = sessionService.save(session_valid_1());
+
+    long countAfterSave = sessionRepository.count();
+
     assertThat(session).isNotNull();
     assertThat(session.getId()).isNotNull();
     assertThat(session.getStartDateTime()).isNotNull();
     assertThat(session.getEndDateTime()).isNotNull();
     assertThat(session.getEndDateTime()).isAfter(session.getStartDateTime());
+    assertThat(countAfterSave).isEqualTo(countBeforeSave + 1);
   }
 }

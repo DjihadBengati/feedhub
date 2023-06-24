@@ -1,6 +1,6 @@
 package com.db.feedhub.service;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static com.db.feedhub.util.CompanyUtils.isValidEmail;
 
 import com.db.feedhub.config.CompanyConfig;
 import com.db.feedhub.model.entity.User;
@@ -10,13 +10,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 @Slf4j
 public class UserService {
 
@@ -24,9 +26,10 @@ public class UserService {
 
   private final CompanyConfig companyConfig;
 
-  public UserService(UserRepository userRepository, CompanyConfig companyConfig) {
-    this.userRepository = userRepository;
-    this.companyConfig = companyConfig;
+  // TODO test function
+  public Optional<User> findById(@NonNull UUID id) {
+    log.debug("Getting user with id: {}", id);
+    return userRepository.findById(id);
   }
 
   public User save(@NonNull User user) {
@@ -81,14 +84,12 @@ public class UserService {
     return userRepository.save(userToUpdate);
   }
 
-  public Page<User> findAll(Pageable pageable) {
+  public Page<User> findAll(@NonNull Pageable pageable) {
     return userRepository.findAll(pageable);
   }
 
-  private void checkCompanyEmailPattern(User user) {
-    if (isBlank(user.getEmail()) ||
-        isBlank(companyConfig.getEmailPattern()) ||
-        !user.getEmail().endsWith(companyConfig.getEmailPattern())) {
+  private void checkCompanyEmailPattern(@NonNull User user) {
+    if (!isValidEmail(user.getEmail(), companyConfig.getEmailPattern())) {
       log.error("Invalid email: {}", user);
       throw new IllegalArgumentException("Invalid email");
     }

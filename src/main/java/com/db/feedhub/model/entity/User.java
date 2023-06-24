@@ -9,16 +9,18 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "feedhub_user")
-@NoArgsConstructor
-@Getter
-@Setter
 public class User {
 
   @Id
@@ -29,7 +31,7 @@ public class User {
   @Email
   private String email;
 
-  private boolean unsubscribe = false;
+  private boolean unsubscribe;
 
   private LocalDateTime unsubscribeDateTime;
 
