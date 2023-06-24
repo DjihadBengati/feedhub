@@ -1,0 +1,13 @@
+package com.db.feedhub.model.entity;
+
+public enum Permission {
+  MANAGER_READ,
+  MANAGER_CREATE,
+  MANAGER_UPDATE,
+  MANAGER_DELETE,
+  USER_CRUD,
+  FEEDBACK_UPDATE,
+  FEEDBACK_DELETE,
+  FEEDBACK_READ,
+  SESSION_CREATE;
+}

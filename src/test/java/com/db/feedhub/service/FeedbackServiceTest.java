@@ -30,17 +30,19 @@ public class FeedbackServiceTest {
   @AfterEach
   void clean() {
     feedbackRepository.deleteAll();
+    sessionRepository.deleteAll();
   }
 
   @Test
   void findById_successful() {
     Session session = sessionRepository.save(session_valid_1());
 
-    Feedback feedback = new Feedback();
-    feedback.setSessionId(session.getId());
-    feedback.setDateTime(now());
-    feedback.setComment("Good !");
-    feedback.setNote(5);
+    Feedback feedback = Feedback.builder()
+        .sessionId(session.getId())
+        .dateTime(now())
+        .comment("Good !")
+        .note(5)
+        .build();
 
     Feedback savedFeedback = feedbackService.save(feedback);
 
@@ -50,6 +52,7 @@ public class FeedbackServiceTest {
     assertThat(result.get().getSessionId().toString()).isEqualTo(
         feedback.getSessionId().toString());
     assertThat(result.get().getNote()).isEqualTo(feedback.getNote());
+    assertThat(result.get().isCensored()).isFalse();
   }
 
   @Test

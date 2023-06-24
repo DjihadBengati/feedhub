@@ -1,5 +1,7 @@
 package com.db.feedhub.model.api;
 
-public record UserApi(String email) {
+import java.util.UUID;
+
+public record UserApi(UUID id, String email) {
 
 }
