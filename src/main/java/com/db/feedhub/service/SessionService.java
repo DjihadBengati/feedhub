@@ -1,7 +1,6 @@
 package com.db.feedhub.service;
 
 import static java.time.LocalDateTime.now;
-import static java.util.Collections.shuffle;
 import static org.springframework.data.domain.Pageable.ofSize;
 
 import com.db.feedhub.model.entity.Session;
@@ -32,31 +31,27 @@ public class SessionService {
     return sessionRepository.save(session);
   }
 
-  // TODO test this function
   public List<Session> saveAll(@NonNull List<Session> sessions) {
     log.debug("Saving {} session(s)", sessions.size());
     return sessionRepository.saveAll(sessions);
   }
 
-  // TODO test this function
   public Page<Session> findAll(@NonNull Pageable pageable) {
     log.debug("Find all sessions");
     return sessionRepository.findAll(pageable);
   }
 
-  // TODO test this function
-  public boolean isValidSession(@NonNull String sessionId) {
-    log.debug("Checking validity of session with id: {}", sessionId);
-    Optional<Session> session = sessionRepository.findById(UUID.fromString(sessionId));
+  public boolean isValidSession(@NonNull UUID id) {
+    log.debug("Checking validity of session with id: {}", id);
+    Optional<Session> session = sessionRepository.findById(id);
     return session.isPresent() &&
         session.get().getStartDateTime().isBefore(now()) &&
         session.get().getEndDateTime().isAfter(now());
   }
 
-  // TODO test this function
-  public void delete(@NonNull String sessionId) {
-    log.debug("Deleting session with id: {}", sessionId);
-    sessionRepository.deleteById(UUID.fromString(sessionId));
+  public void delete(@NonNull UUID id) {
+    log.debug("Deleting session with id: {}", id);
+    sessionRepository.deleteById(id);
   }
 
   // TODO test this function
@@ -85,8 +80,6 @@ public class SessionService {
 
   private void generateSessionsForUsers(@NonNull Page<User> usersPage) {
     List<User> usersList = usersPage.getContent();
-
-    shuffle(usersList);
 
     List<Session> sessionsToSave = new ArrayList<>();
 

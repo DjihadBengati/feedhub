@@ -27,7 +27,7 @@ public class FeedbackService {
     log.debug("Saving new feedback: {}", feedback);
 
     if (isNull(feedback.getSessionId()) ||
-        !sessionService.isValidSession(feedback.getSessionId().toString())) {
+        !sessionService.isValidSession(feedback.getSessionId())) {
       log.error("Invalid session ID for feedback: {}", feedback);
       throw new IllegalArgumentException("Invalid session ID");
     }
@@ -35,7 +35,7 @@ public class FeedbackService {
     feedback.setDateTime(LocalDateTime.now());
     Feedback savedFeedback = feedbackRepository.save(feedback);
 
-    sessionService.delete(savedFeedback.getSessionId().toString());
+    sessionService.delete(savedFeedback.getSessionId());
 
     return savedFeedback;
   }
