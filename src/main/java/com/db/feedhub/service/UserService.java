@@ -26,7 +26,6 @@ public class UserService {
 
   private final CompanyConfig companyConfig;
 
-  // TODO test function
   public Optional<User> findById(@NonNull UUID id) {
     log.debug("Getting user with id: {}", id);
     return userRepository.findById(id);

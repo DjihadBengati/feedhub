@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.db.feedhub.model.entity.User;
 import com.db.feedhub.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,14 @@ public class UserServiceTest {
   @AfterEach
   void clean() {
     userRepository.deleteAll();
+  }
+
+  @Test
+  void findById() {
+    User savedUser = userRepository.save(User.builder().email("toto@company.com").build());
+    Optional<User> result = userService.findById(savedUser.getId());
+    assertThat(result).isPresent();
+    assertThat(result.get()).usingRecursiveComparison().isEqualTo(savedUser);
   }
 
   @Test
