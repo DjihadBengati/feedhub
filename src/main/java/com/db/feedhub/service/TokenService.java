@@ -2,6 +2,9 @@ package com.db.feedhub.service;
 
 import com.db.feedhub.model.entity.Token;
 import com.db.feedhub.repository.TokenRepository;
+
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,12 +21,12 @@ public class TokenService {
   private final TokenRepository tokenRepository;
 
   // TODO test function
+  @Transactional
   public Optional<Token> findByToken(@NonNull String token) {
     log.debug("Getting token starts with: {}", token.substring(0, 10).concat("****"));
     return tokenRepository.findByToken(token);
   }
 
-  // TODO test function
   public Token save(@NonNull Token token) {
     log.debug("Creating token {}", token);
     return tokenRepository.save(token);
@@ -43,6 +46,7 @@ public class TokenService {
     tokenRepository.saveAll(tokens);
   }
 
+  @Transactional
   public List<Token> findAllValidTokenByAdmin(UUID adminId) {
     log.debug("Getting all valid tokens for administrator id: {}", adminId.toString());
     return tokenRepository.findAllValidTokenByAdmin(adminId);
