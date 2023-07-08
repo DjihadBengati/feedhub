@@ -106,6 +106,8 @@ public class AdministratorService {
     if (!isNull(authHeader) && authHeader.startsWith("Bearer ")) {
       refreshToken = authHeader.substring(7);
       emailFromToken = jwtService.extractUsername(refreshToken);
+
+      // TODO change role for requested email and not the authenticated administrator
       if (!isNull(emailFromToken) &&
           emailFromToken.equalsIgnoreCase(email)) {
         Optional<Administrator> administrator = administratorRepository.findByEmail(email);

@@ -165,7 +165,7 @@ public class UserServiceTest {
     User savedUser = userRepository.save(user);
     long countAfterSave = userRepository.count();
 
-    userService.delete(savedUser.getId().toString());
+    userService.delete(savedUser.getId());
     long countAfterDelete = userRepository.count();
 
     assertThat(countAfterDelete).isEqualTo(countAfterSave - 1);

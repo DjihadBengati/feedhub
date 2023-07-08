@@ -1,5 +1,7 @@
 package com.db.feedhub.resource;
 
+import static java.util.Objects.isNull;
+
 import com.db.feedhub.mapper.AdministratorMapper;
 import com.db.feedhub.model.api.AdministratorApi;
 import com.db.feedhub.model.entity.Administrator;
@@ -17,10 +19,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 // TODO test resource
 @RestController
@@ -30,6 +34,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdministratorResource {
 
   private final AdministratorService administratorService;
+
+  @PostMapping(produces = "application/json", consumes = "application/json")
+  @PreAuthorize("hasAuthority('USER_CRUD')")
+  public ResponseEntity<AdministratorApi> create(@RequestBody AdministratorApi administratorApi,
+      UriComponentsBuilder uriBuilder) {
+    try {
+      if (!isNull(administratorApi.id())) {
+        log.error("Error creating a administrator, id is not null");
+        return ResponseEntity.badRequest().build();
+      }
+
+      Administrator user = administratorService.save(AdministratorMapper.map(administratorApi));
+      String resourceUri = uriBuilder.path("/api/v1/administrator/{id}")
+          .buildAndExpand(user.getId())
+          .toUriString();
+      return ResponseEntity.created(UriComponentsBuilder
+              .fromUriString(resourceUri)
+              .build().toUri())
+          .build();
+    } catch (IllegalArgumentException exception) {
+      log.error("Error creating a user", exception);
+      return ResponseEntity.badRequest().build();
+    }
+  }
 
   @GetMapping(produces = "application/json")
   @PreAuthorize("hasAuthority('MANAGER_READ')")

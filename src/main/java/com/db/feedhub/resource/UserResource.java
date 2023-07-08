@@ -1,5 +1,7 @@
 package com.db.feedhub.resource;
 
+import static java.util.Objects.isNull;
+
 import com.db.feedhub.mapper.UserMapper;
 import com.db.feedhub.model.api.UserApi;
 import com.db.feedhub.model.entity.User;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +56,11 @@ public class UserResource {
   public ResponseEntity<UserApi> create(@RequestBody UserApi userApi,
       UriComponentsBuilder uriBuilder) {
     try {
+      if (!isNull(userApi.id())) {
+        log.error("Error creating a user, id is not null");
+        return ResponseEntity.badRequest().build();
+      }
+
       User user = userService.save(UserMapper.map(userApi));
       String resourceUri = uriBuilder.path("/api/v1/user/{id}")
           .buildAndExpand(user.getId())
@@ -67,5 +75,16 @@ public class UserResource {
     }
   }
 
-  // TODO delete resource
+  // TODO test resource
+  @DeleteMapping(value = "/{id}")
+  @PreAuthorize("hasAuthority('USER_CRUD')")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    try {
+      userService.delete(id);
+      return ResponseEntity.ok().build();
+    } catch (IllegalArgumentException exception) {
+      log.error("Error deleting a feedback", exception);
+      return ResponseEntity.badRequest().build();
+    }
+  }
 }

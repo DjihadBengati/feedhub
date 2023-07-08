@@ -43,9 +43,9 @@ public class UserService {
     return userRepository.saveAll(users);
   }
 
-  public void delete(@NonNull String userId) {
-    log.debug("Deleting user with ID: {}", userId);
-    userRepository.deleteById(UUID.fromString(userId));
+  public void delete(@NonNull UUID id) {
+    log.debug("Deleting user with ID: {}", id);
+    userRepository.deleteById(id);
   }
 
   @Transactional
