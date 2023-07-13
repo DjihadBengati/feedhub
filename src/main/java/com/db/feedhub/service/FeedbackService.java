@@ -4,7 +4,11 @@ import static java.util.Objects.isNull;
 
 import com.db.feedhub.model.entity.Feedback;
 import com.db.feedhub.repository.FeedbackRepository;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -13,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +35,11 @@ public class FeedbackService {
         !sessionService.isValidSession(feedback.getSessionId())) {
       log.error("Invalid session ID for feedback: {}", feedback);
       throw new IllegalArgumentException("Invalid session ID");
+    }
+
+    if (feedback.getNote() > 10 || feedback.getNote() < 0) {
+      log.error("Invalid note for feedback: {}", feedback);
+      throw new IllegalArgumentException("Invalid note");
     }
 
     feedback.setDateTime(LocalDateTime.now());
@@ -66,5 +76,15 @@ public class FeedbackService {
   public Page<Feedback> findAllCensored(Pageable pageable) {
     log.debug("Getting censored feedbacks list");
     return feedbackRepository.findByCensoredTrue(pageable);
+  }
+
+  @Transactional
+  public List<Feedback> findAllByDateBetween(@NonNull LocalDate start, @NonNull LocalDate end) {
+    log.debug("Getting feedbacks between {} and {}", start, end);
+    if (start.isAfter(end)) {
+      throw new IllegalArgumentException("Start date is after end date");
+    }
+
+    return feedbackRepository.findAllByDateTimeBetween(start.atStartOfDay(), end.atTime(LocalTime.MAX));
   }
 }

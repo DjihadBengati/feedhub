@@ -18,12 +18,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 
 @Configuration
 @ConfigurationProperties("application.company")
 @Getter
 @Setter
 @Slf4j
+@Validated
 public class CompanyConfig {
 
   @NotBlank
@@ -41,9 +43,6 @@ public class CompanyConfig {
       Optional<Administrator> administrator = administratorService.findByEmail(administratorEmail);
       if (administrator.isEmpty()) {
         String password = RandomStringUtils.random(8, true, true);
-        log.warn("New administrator to be created email: {}, password:{}. Password must be changed",
-            administratorEmail,
-            password);
 
         Administrator administratorToSave = Administrator.builder()
             .role(Role.ADMIN)
@@ -63,6 +62,11 @@ public class CompanyConfig {
             .build());
 
         tokenService.save(token);
+
+        log.warn("New administrator to be created email: {}, password:{}. Password must be changed",
+            administratorEmail,
+            password);
+
         // TODO send email requesting password change
       } else if (!administrator.get().isPasswordUpdated()) {
         log.warn("Administrator password must be updated !");

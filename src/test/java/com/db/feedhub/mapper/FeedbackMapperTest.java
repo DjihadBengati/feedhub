@@ -19,9 +19,20 @@ public class FeedbackMapperTest {
   }
 
   @Test
-  void map_apiObjectEntityTo_successful() {
+  void map_apiObjectToEntity_successful() {
     Feedback entity = FeedbackMapper.map(feedbackApi());
     assertThat(entity).usingRecursiveComparison()
         .isEqualTo(feedback());
+  }
+
+  @Test
+  void map_censoredEntityToApiObject_successful() {
+    Feedback feedback = feedback();
+    feedback.setCensored(true);
+    FeedbackApi api = FeedbackMapper.map(feedback);
+    assertThat(api).usingRecursiveComparison()
+        .ignoringFields("sessionId", "comment")
+        .isEqualTo(feedbackApi());
+    assertThat(api.comment()).isEqualTo("****");
   }
 }

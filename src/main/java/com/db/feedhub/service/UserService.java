@@ -26,7 +26,6 @@ public class UserService {
 
   private final CompanyConfig companyConfig;
 
-  // TODO test function
   public Optional<User> findById(@NonNull UUID id) {
     log.debug("Getting user with id: {}", id);
     return userRepository.findById(id);
@@ -44,9 +43,9 @@ public class UserService {
     return userRepository.saveAll(users);
   }
 
-  public void delete(@NonNull String userId) {
-    log.debug("Deleting user with ID: {}", userId);
-    userRepository.deleteById(UUID.fromString(userId));
+  public void delete(@NonNull UUID id) {
+    log.debug("Deleting user with ID: {}", id);
+    userRepository.deleteById(id);
   }
 
   @Transactional
