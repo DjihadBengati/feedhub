@@ -127,6 +127,8 @@ public class AdministratorService {
   public void updatePassword(@NonNull HttpServletRequest httpRequest,
       @NonNull String email,
       @NonNull String password) {
+    log.debug("Updating password for administrator with email: {}", email);
+
     if (!isValidEmail(email, companyConfig.getEmailPattern())) {
       log.error("Invalid email: {}", email);
       throw new IllegalArgumentException("Invalid email");

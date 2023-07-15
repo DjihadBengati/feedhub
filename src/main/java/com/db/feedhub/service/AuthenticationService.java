@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,12 +60,12 @@ public class AuthenticationService {
   }
 
   public AuthenticationResponseApi authenticate(@NonNull AuthenticationRequestApi request) {
+    log.debug("Authentication request for administrator with email: {}", request.email());
     checkCompanyEmailPattern(request.email());
 
-    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-        request.email(),
-        request.password()
-    ));
+    val credentials = new UsernamePasswordAuthenticationToken(request.email(),
+        request.password());
+    authenticationManager.authenticate(credentials);
 
     Administrator administrator = administratorService.findByEmail(request.email())
         .orElseThrow();

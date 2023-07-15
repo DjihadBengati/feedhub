@@ -32,8 +32,8 @@ public class AuthenticationResource {
   public ResponseEntity<AuthenticationResponseApi> authenticate(
       @RequestBody AuthenticationRequestApi request) {
     try {
-      authenticationService.authenticate(request);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
+      return ResponseEntity.status(HttpStatus.CREATED)
+          .body(authenticationService.authenticate(request));
     } catch (IllegalArgumentException exception) {
       log.error("Authentication error", exception);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
