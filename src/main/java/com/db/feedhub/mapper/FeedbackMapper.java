@@ -16,6 +16,14 @@ public class FeedbackMapper {
         feedback.getDateTime());
   }
 
+  public static FeedbackApi mapCensored(@NonNull Feedback feedback) {
+    return new FeedbackApi(feedback.getId(),
+        null,
+        feedback.getNote(),
+        feedback.getComment(),
+        feedback.getDateTime());
+  }
+
   public static Feedback map(@NonNull FeedbackApi feedbackApi) {
     return Feedback.builder()
         .id(feedbackApi.id())

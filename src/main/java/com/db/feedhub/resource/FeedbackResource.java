@@ -7,6 +7,7 @@ import com.db.feedhub.mapper.FeedbackMapper;
 import com.db.feedhub.model.api.FeedbackApi;
 import com.db.feedhub.model.entity.Feedback;
 import com.db.feedhub.service.FeedbackService;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -54,11 +57,25 @@ public class FeedbackResource {
   }
 
   // TODO test resource
+  @GetMapping(value = "/between", produces = "application/json", consumes = "application/json")
+  public Page<FeedbackApi> findPageByDateBetween(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+      @NonNull Pageable pageable) {
+    Page<Feedback> feedbackPage = feedbackService.findPageByDateBetween(start,
+        end,
+        pageable);
+    return new PageImpl<>(feedbackPage.getContent().stream().map(FeedbackMapper::map).toList(),
+        feedbackPage.getPageable(),
+        feedbackPage.getTotalElements());
+  }
+
+  // TODO test resource
   @GetMapping(value = "/censored", produces = "application/json", consumes = "application/json")
   @PreAuthorize("hasAuthority('FEEDBACK_READ')")
   public Page<FeedbackApi> findAllCensored(@NonNull Pageable pageable) {
     Page<Feedback> feedbackPage = feedbackService.findAllCensored(pageable);
-    return new PageImpl<>(feedbackPage.getContent().stream().map(FeedbackMapper::map).toList(),
+    return new PageImpl<>(
+        feedbackPage.getContent().stream().map(FeedbackMapper::mapCensored).toList(),
         feedbackPage.getPageable(),
         feedbackPage.getTotalElements());
   }

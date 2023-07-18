@@ -4,7 +4,7 @@ import static java.util.Objects.isNull;
 
 import com.db.feedhub.model.entity.Feedback;
 import com.db.feedhub.repository.FeedbackRepository;
-
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -85,6 +84,21 @@ public class FeedbackService {
       throw new IllegalArgumentException("Start date is after end date");
     }
 
-    return feedbackRepository.findAllByDateTimeBetween(start.atStartOfDay(), end.atTime(LocalTime.MAX));
+    return feedbackRepository.findAllByDateTimeBetween(start.atStartOfDay(),
+        end.atTime(LocalTime.MAX));
+  }
+
+  @Transactional
+  public Page<Feedback> findPageByDateBetween(@NonNull LocalDate start,
+      @NonNull LocalDate end,
+      @NonNull Pageable pageable) {
+    log.debug("Getting feedbacks page between {} and {}", start, end);
+    if (start.isAfter(end)) {
+      throw new IllegalArgumentException("Start date is after end date");
+    }
+
+    return feedbackRepository.findPageByDateTimeBetween(start.atStartOfDay(),
+        end.atTime(LocalTime.MAX),
+        pageable);
   }
 }

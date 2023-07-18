@@ -9,19 +9,18 @@ import com.db.feedhub.model.entity.Feedback;
 import com.db.feedhub.model.entity.Session;
 import com.db.feedhub.repository.FeedbackRepository;
 import com.db.feedhub.repository.SessionRepository;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class FeedbackServiceTest {
@@ -102,7 +101,49 @@ public class FeedbackServiceTest {
 
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
-    assertThat(result).containsExactlyInAnyOrderElementsOf(feedbacks.stream().filter(f -> f.getNote() == 5).toList());
+    assertThat(result).containsExactlyInAnyOrderElementsOf(
+        feedbacks.stream().filter(f -> f.getNote() == 5).toList());
+  }
+
+  @Test
+  void findPageByDateTimeBetween_successful() {
+    Session s1 = sessionRepository.save(new Session());
+    Feedback f1 = Feedback.builder()
+        .id(randomUUID())
+        .sessionId(s1.getId())
+        .note(5)
+        .dateTime(LocalDateTime.now())
+        .build();
+    Session s2 = sessionRepository.save(new Session());
+    Feedback f2 = Feedback.builder()
+        .id(randomUUID())
+        .sessionId(s2.getId())
+        .note(5)
+        .dateTime(LocalDateTime.now())
+        .build();
+    Session s3 = sessionRepository.save(new Session());
+    Feedback f3 = Feedback.builder()
+        .id(randomUUID())
+        .sessionId(s3.getId())
+        .note(10)
+        .dateTime(LocalDateTime.of(LocalDate.of(2023, 1, 1), LocalTime.MIN))
+        .build();
+
+    feedbackRepository.saveAll(Stream.of(f1, f2, f3).toList());
+
+    List<Feedback> feedbacks = feedbackRepository.findAll();
+    assertThat(feedbacks).isNotEmpty();
+
+    Page<Feedback> result = feedbackService.findPageByDateBetween(LocalDate.now(),
+        LocalDate.now(),
+        Pageable.ofSize(5));
+
+    assertThat(result).isNotNull();
+    assertThat(result.getTotalPages()).isEqualTo(1);
+    assertThat(result.getContent())
+        .containsExactlyInAnyOrderElementsOf(feedbacks.stream()
+            .filter(f -> f.getNote() == 5)
+            .toList());
   }
 
   @Test

@@ -20,4 +20,9 @@ public interface FeedbackRepository extends ListCrudRepository<Feedback, UUID>,
   @Query(value = "SELECT * FROM feedhub_feedback WHERE date_time BETWEEN :startDateTime AND :endDateTime", nativeQuery = true)
   List<Feedback> findAllByDateTimeBetween(@Param("startDateTime") LocalDateTime start,
       @Param("endDateTime") LocalDateTime end);
+
+  @Query(value = "SELECT * FROM feedhub_feedback WHERE date_time BETWEEN :startDateTime AND :endDateTime", nativeQuery = true)
+  Page<Feedback> findPageByDateTimeBetween(@Param("startDateTime") LocalDateTime start,
+      @Param("endDateTime") LocalDateTime end,
+      Pageable pageable);
 }

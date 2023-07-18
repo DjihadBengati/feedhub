@@ -1,0 +1,11 @@
+<!-- Navbar -->
+<app-navbar></app-navbar>
+<div class="container" style="margin-top: calc(2 * 50px);">
+  <h2>{{ currentDate }}</h2>
+  <div *ngIf="feedbacks.length === 0">
+    <p>No feedbacks found for today.</p>
+  </div>
+  <div *ngIf="feedbacks.length > 0">
+    <!-- Render your list here -->
+  </div>
+</div>
